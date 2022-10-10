@@ -75,12 +75,14 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>SPDLOG_ACTIVE_LEVEL=0;NOMINMAX;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>src;resources;gen</AdditionalIncludeDirectories>
-      <AdditionalOptions>/experimental:external /external:anglebrackets /external:W0</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4100;4189</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4189;5054</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,13 +107,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SPDLOG_ACTIVE_LEVEL=0;NOMINMAX;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>src;resources;gen</AdditionalIncludeDirectories>
-      <AdditionalOptions>/experimental:external /external:anglebrackets /external:W0</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>false</SDLCheck>
-      <DisableSpecificWarnings>4100;4189</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4189;5054</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,12 +153,10 @@
     <ClInclude Include="resources\Resource.h" />
     <ClInclude Include="src\ChiralScroll.h" />
     <ClInclude Include="src\ChiralScrollException.h" />
-    <ClInclude Include="src\framework.h" />
     <ClInclude Include="src\HidUtils.h" />
     <ClInclude Include="src\Scroller.h" />
     <ClInclude Include="src\Settings.h" />
     <ClInclude Include="src\StringUtils.h" />
-    <ClInclude Include="src\targetver.h" />
     <ClInclude Include="src\TouchpadCtrl.h" />
     <ClInclude Include="src\TouchSession.h" />
     <ClInclude Include="src\Vector.h" />

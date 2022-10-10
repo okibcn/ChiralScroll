@@ -31,20 +31,19 @@ private:
 	float value_;
 };
 
-typedef void (wxEvtHandler::*TouchpadEventFunction)(TouchpadEvent&);
-#define TouchpadEventHandler(func) \
-    wxEVENT_HANDLER_CAST(TouchpadEventFunction, func)
 
 class TouchpadCtrl : public wxWindow
 {
 public:
-	TouchpadCtrl(
+	explicit TouchpadCtrl(
 		wxWindow* parent,
 		wxWindowID id = wxID_ANY,
 		const wxPoint& pos = wxDefaultPosition,
 		const wxSize& size = wxDefaultSize,
 		long style = 0,
 		const wxString& name = wxPanelNameStr);
+
+	bool Enable(bool enable) override;
 
 	void SetVerticalZone(float vScrollZone);
 	void SetHorizontalZone(float hScrollZone);
@@ -78,16 +77,12 @@ private:
 	// This is tuned to match the width of the slider knobs.
 	static constexpr int kCornerSize = 13;
 
-	const wxCursor vGrabCursor_;
-	const wxCursor hGrabCursor_;
-
 	Grabber& hGrabber_;
 	Grabber& vGrabber_;
 
 	wxRegion clippingRegion_;
 	float vScrollZone_;
 	float hScrollZone_;
-	Grabber* currentGrabber_;
 
 	wxDECLARE_EVENT_TABLE();
 };

@@ -60,12 +60,6 @@
     <ClInclude Include="src\ChiralScroll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\HidUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>

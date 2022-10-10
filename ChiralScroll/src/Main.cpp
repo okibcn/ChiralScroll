@@ -1,6 +1,3 @@
-// Necessary for LoadIconMetric.
-#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
-
 #include <exception>
 #include <filesystem>
 #include <optional>
@@ -26,12 +23,10 @@
 #include <wx/valnum.h>
 
 // Must come after wrapwin.h
-#include <commctrl.h>
 #include <hidusage.h>
 
 #include "ChiralScroll.h"
 #include "ChiralScrollException.h"
-#include "framework.h"
 #include "HidUtils.h"
 #include "resource.h"
 #include "Settings.h"
@@ -231,12 +226,14 @@ public:
 	ChiralScrollFrame(
 		const std::string& title,
 		Settings& settings,
+		std::filesystem::path settingsPath,
 		absl::flat_hash_map<HANDLE, TouchDevice> touchDevices,
 		ChiralScroll chiralScroll)
 		: wxFrame(nullptr, wxID_ANY, title),
 		  hWnd_(static_cast<HWND>(GetHWND())),
 		  icon_(new NotificationIcon(*this)),  // wx takes ownership
 		  settings_(settings),
+		  settingsPath_(settingsPath),
 		  touchDevices_(std::move(touchDevices)),
 		  chiralScroll_(std::move(chiralScroll)),
 		  stopped_(false)
@@ -270,6 +267,7 @@ public:
 	{
 		settings_ = settings;
 		chiralScroll_.SetSettings(settings);
+		settings_.ToFile(settingsPath_);
 	}
 
 	WXLRESULT MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) override
@@ -323,6 +321,7 @@ private:
 	const HWND hWnd_;
 	NotificationIcon* const icon_;
 	Settings& settings_;
+	std::filesystem::path settingsPath_;
 	absl::flat_hash_map<HANDLE, TouchDevice> touchDevices_;
 	ChiralScroll chiralScroll_;
 	bool stopped_;
@@ -425,33 +424,20 @@ public:
 			deviceNames.push_back(std::string(pair.second.name()));
 		}
 
-		settingsPath_ = GetCurrentDirectory() / "settings.ini";
-		settings_ = Settings::FromFile(settingsPath_, deviceNames);
+		std::filesystem::path settingsPath = GetCurrentDirectory() / "settings.ini";
+		settings_ = Settings::FromFile(settingsPath, deviceNames);
 
 		// wx takes ownership.
 		chiralScrollFrame_ = new ChiralScrollFrame(
 			kTitle,
 			settings_,
+			std::move(settingsPath),
 			std::move(devices),
 			ChiralScroll(
 				settings_,
 				std::make_unique<WinScroller>(WinScroller::Direction::kVertical),
 				std::make_unique<WinScroller>(WinScroller::Direction::kHorizontal)));
 		return true;
-	}
-
-	int OnExit() override
-	{
-		// We must handle exceptions here because this is called from a destructor.
-		try
-		{
-			settings_.ToFile(settingsPath_);
-		}
-		catch(const std::exception& e)
-		{
-			OnException(e);
-		}
-		return wxApp::OnExit();
 	}
 
 	bool OnExceptionInMainLoop() override
@@ -485,7 +471,6 @@ private:
 			MB_OK | MB_ICONERROR);
 	}
 
-	std::filesystem::path settingsPath_;
 	Settings settings_;
 	ChiralScrollFrame* chiralScrollFrame_;
 	bool logToConsole_ = false;

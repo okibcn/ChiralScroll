@@ -1,6 +1,7 @@
 #include "TouchpadCtrl.h"
 
 #include <algorithm>
+
 #include <wx/colour.h>
 #include <wx/dcmemory.h>
 #include <wx/utils.h>
@@ -64,6 +65,7 @@ private:
 
 	void OnCaptureLost(wxMouseCaptureLostEvent& event)
 	{
+		grabbed_ = false;
 	}
 
 	static constexpr int kGrabberSize = 7;
@@ -91,14 +93,11 @@ TouchpadCtrl::TouchpadCtrl(
 	long style,
 	const wxString& name)
 	: wxWindow(parent, id, pos, size, style, name),
-	  vGrabCursor_(wxCURSOR_SIZEWE),
-	  hGrabCursor_(wxCURSOR_SIZENS),
 	  vGrabber_(*new Grabber(*this, Grabber::Direction::VERTICAL)),
 	  hGrabber_(*new Grabber(*this, Grabber::Direction::HORIZONTAL)),
 	  clippingRegion_(GetClippingRegion(GetClientSize())),
 	  vScrollZone_(0.0f),
-	  hScrollZone_(0.0f),
-	  currentGrabber_(nullptr)
+	  hScrollZone_(0.0f)
 {
 	Render();
 };
@@ -143,15 +142,13 @@ std::pair<float, float> TouchpadCtrl::GetValue() const
 
 void TouchpadCtrl::DoSetVerticalZone(float vScrollZone)
 {
-	vScrollZone = std::clamp(vScrollZone, 0.0f, 1.0f);
-	vScrollZone_ = vScrollZone;
+	vScrollZone_ = std::clamp(vScrollZone, 0.0f, 1.0f);;
 	vGrabber_.SetPosition(wxPoint{GetVerticalZonePixels(), GetClientSize().GetHeight()/2} - vGrabber_.GetSize()/2);
 }
 
 void TouchpadCtrl::DoSetHorizontalZone(float hScrollZone)
 {
-	hScrollZone = std::clamp(hScrollZone, 0.0f, 1.0f);
-	hScrollZone_ = hScrollZone;
+	hScrollZone_ = std::clamp(hScrollZone, 0.0f, 1.0f);
 	hGrabber_.SetPosition(wxPoint{GetClientSize().GetWidth()/2, GetHorizontalZonePixels()} - hGrabber_.GetSize()/2);
 }
 
@@ -175,6 +172,14 @@ void TouchpadCtrl::StartHorizontalEvent()
 {
 	TouchpadEvent event(hScrollZone_, EVT_TOUCHPAD_HORIZONTAL, this->GetId());
 	ProcessEvent(event);
+}
+
+bool TouchpadCtrl::Enable(bool enable) {
+	bool result = wxWindow::Enable(enable);
+	Render();
+	vGrabber_.Refresh();
+	hGrabber_.Refresh();
+	return result;
 }
 
 void TouchpadCtrl::OnResize(wxSizeEvent& event)
@@ -239,11 +244,6 @@ void TouchpadCtrl::Render(wxClientDC& dc)
 			dc.SetPen(*wxGREEN_PEN);
 			dc.DrawLine(vScrollTopLeft, vScrollBottomLeft);
 		}
-		else
-		{
-			// We need to extend the horizontal zone line so the floodfill doesn't leak.
-			dc.DrawLine(hScrollTopRight, wxPoint{width, hScrollZone});
-		}
 
 		// Fill in scroll zones.
 		if(hScrollZone_ > 0)
@@ -259,7 +259,7 @@ void TouchpadCtrl::Render(wxClientDC& dc)
 	}
 	else  // !IsEnabled()
 	{
-		// Blend into background.
+		// Blend grabbers into background.
 		vGrabber_.SetBackgroundColour(touchpadBrush.GetColour());
 		hGrabber_.SetBackgroundColour(touchpadBrush.GetColour());
 	}

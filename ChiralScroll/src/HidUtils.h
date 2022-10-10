@@ -15,7 +15,6 @@
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
-#include "framework.h"
 #include "ChiralScrollException.h"
 
 namespace chiralscroll
